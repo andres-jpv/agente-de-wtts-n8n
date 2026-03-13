@@ -1,0 +1,684 @@
+{
+  "name": "agente legal con voz",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2256,
+        848
+      ],
+      "id": "2ec51405-e401-4071-9b2b-70d1644336f0",
+      "name": "Telegram Trigger1",
+      "webhookId": "e0a2a716-9bee-4363-96c6-6f6fa154f9f9",
+      "credentials": {
+        "telegramApi": {
+          "id": "Q9YpTitDSovQljbE",
+          "name": "Telegram bot estudiantes"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "4859e43e-eedd-4a38-8aba-ce7c2cfb489c"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Nota de voz"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2032,
+        848
+      ],
+      "id": "b27e108e-ab9e-4743-ad9c-c8aba70adc9d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1808,
+        624
+      ],
+      "id": "57f24e73-d555-4fdb-9a73-02f91bc9c8d8",
+      "name": "Get a file1",
+      "webhookId": "82b5dd47-0ed5-4d7e-b618-e52f7490aee6",
+      "credentials": {
+        "telegramApi": {
+          "id": "Q9YpTitDSovQljbE",
+          "name": "Telegram bot estudiantes"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -1632,
+        624
+      ],
+      "id": "a491bb40-4dd1-4db5-a15b-a0f70b9062bc",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=Eres Flor, una agente conversacional virtual de voz clara, amable y confiable, representante de la Floristería “Flor de Buenos Aires”.\nTu estilo es cálido, profesional y cercano, como el de una asesora de tienda que ayuda al cliente a elegir el mejor arreglo floral para cada ocasión.\n\nEstás entrenada con un catálogo estandarizado de 7 productos florales, con información sobre nombre, descripción, ocasión, disponibilidad, tiempo de entrega y cobertura de servicio.\nSabes que la floristería ofrece entregas sin costo adicional dentro de:\n\nCiudad de Buenos Aires (antes “CABA”) – zona central de la capital argentina.\n\nGran Buenos Aires (antes “GBA”) – localidades metropolitanas cercanas a la ciudad.\n\nNota: Aunque el texto de tu base de conocimiento puede incluir los acrónimos CABA y GBA, debes sustituirlos siempre por “Ciudad de Buenos Aires” o “Gran Buenos Aires” al hablar, para sonar natural y profesional.\n\nAl iniciar la conversación, preséntate siempre, por ejemplo:\n\"Hola, soy Flor, tu asistente virtual de la Floristería Flor de Buenos Aires. Estoy aquí para ayudarte a elegir el arreglo ideal. ¿Podrías darme tu nombre y contarme para qué ocasión necesitas el arreglo?\"\n\nCon el nombre proporcionado, debes utilizarlo en cada interacción, creando una experiencia personalizada y cercana.\n\nPor el momento, tu función es únicamente informativa y de recomendación, ayudando a los usuarios a conocer los productos y sugerir opciones según la ocasión indicada.\nNo brindas precios ni gestionas pedidos en esta etapa.\nTus respuestas deben ser breves y claras, como máximo 30 segundos de duración, equivalentes a unas 70 palabras.\nCuando un cliente describe la ocasión (ejemplo: cumpleaños, funeral, aniversario), sugieres uno de los productos del catálogo que encaje mejor, explicando brevemente su estilo, flores principales y ocasión recomendada.\n\nSi la pregunta está fuera del catálogo o no tienes información específica, responde con amabilidad:\n\"Por el momento solo puedo brindar información sobre nuestros arreglos del catálogo. ¿Te gustaría que te recomiende uno para la ocasión que necesitas?\"\n\nMantén siempre un tono cordial, servicial y confiable, como el de una florista profesional ayudando a un cliente a elegir el detalle perfecto."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -1248,
+        864
+      ],
+      "id": "85ccf384-114f-47e5-9492-43aac3323188",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab697fb2-808c-4f98-8034-c602d630f955",
+              "name": "chatInput",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        624
+      ],
+      "id": "84823b6d-6e4f-4787-8562-6180fa18d173",
+      "name": "Define chatInput2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c398524f-2ca8-4b12-80d0-f83ab5bc6cd0",
+              "name": "chatInput",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        864
+      ],
+      "id": "2cb5d15d-7607-4e6a-9f44-62cb9c39b60c",
+      "name": "Define chatInput3"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        544,
+        1280
+      ],
+      "id": "a12b4b96-d484-4ca5-8bdf-153beb4be0e8",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "EttUngnjttbWiInI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Q6gBEPNyn70RM-X9Mn30jqgUbxVhCPEB",
+          "mode": "list",
+          "cachedResultName": "Catálogo+Flor+de+Buenos+Aires.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Q6gBEPNyn70RM-X9Mn30jqgUbxVhCPEB/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        336,
+        1280
+      ],
+      "id": "fced7800-d8f9-4a65-9d57-74d7799511b0",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "LUxKb4dEY7rFJXjx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        1520
+      ],
+      "id": "8468f533-d520-4f13-97f2-5009c505fd57",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "pdfLoader",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        1520
+      ],
+      "id": "4a130812-08bd-4309-a258-0b30146574ab",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "maxTokens": -1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1296,
+        1104
+      ],
+      "id": "2e6eaa3d-18ea-4c82-9499-fe2a0a3090ce",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger1').item.json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -1152,
+        1104
+      ],
+      "id": "0fc98820-aeb9-43f3-97a6-4548706bac98",
+      "name": "Postgres Chat Memory1",
+      "credentials": {
+        "postgres": {
+          "id": "fTHqNTmZX7gpkj4C",
+          "name": "Credencial Postgres "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Base vectorizada del Catálogo de Productos de la Floristería Flor de Buenos Aires",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -1024,
+        1232
+      ],
+      "id": "84276696-6afd-4dfc-9402-099f984132d1",
+      "name": "Supabase Vector Store3",
+      "credentials": {
+        "supabaseApi": {
+          "id": "EttUngnjttbWiInI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1024,
+        1440
+      ],
+      "id": "25753fda-23d1-442d-b439-d750f30c9c5a",
+      "name": "Embeddings OpenAI3",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## MCP Server\n",
+        "height": 600,
+        "width": 1100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "a1985014-6731-4e61-8f75-2f996fead3c2",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Cargar la Base Vectorial\n",
+        "height": 500,
+        "width": 1100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        1184
+      ],
+      "typeVersion": 1,
+      "id": "2870d880-09b9-405e-828d-b9c6169ec3a1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Agente de Voz\n",
+        "height": 1180,
+        "width": 2140,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2336,
+        464
+      ],
+      "typeVersion": 1,
+      "id": "a351923d-57dc-43d4-b4bc-193f0ebf3faf",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "={{ $('Telegram Trigger1').item.json.message.chat.id }}",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "Audio generado con ElevenLabs"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -592,
+        864
+      ],
+      "id": "647c9668-3ca1-432a-b245-d012733d3459",
+      "name": "Send an audio file1",
+      "webhookId": "ba778a8c-2387-481f-8617-6b9b571a63e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "Q9YpTitDSovQljbE",
+          "name": "Telegram bot estudiantes"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/4wDRKlxcHNOFO5kBvE81",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "0595397ff25ea37f4f6975e0f10d5a92780ef89b47526cc8cda3b4204e44ee6a"
+            },
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"={{ $json.output\n      .replace(/\\n+/g, ' ')         /* quita saltos de línea */\n      .replace(/^=+/, '')           /* quita '=' al inicio si aparece */\n      .replace(/^\\s*claro[,:-]?\\s*/i, '') /* quita un 'claro' inicial si tu agente lo pone */\n      .trim()\n  }}\",\n  \"model_id\": \"eleven_multilingual_v2\",\n  \"voice_settings\": {\n    \"stability\": 0.45,\n    \"similarity_boost\": 0.8,\n    \"style\": 0.25,\n    \"use_speaker_boost\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -832,
+        864
+      ],
+      "id": "5a1a0298-9cb5-4d8d-8781-ebc00aef07bf",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {
+    "Telegram Trigger1": [
+      {
+        "json": {
+          "update_id": 630172328,
+          "message": {
+            "message_id": 76,
+            "from": {
+              "id": 7956132817,
+              "is_bot": false,
+              "first_name": "Andres",
+              "language_code": "es"
+            },
+            "chat": {
+              "id": 7956132817,
+              "first_name": "Andres",
+              "type": "private"
+            },
+            "date": 1773416022,
+            "text": "me llamo andres y quiero que sea un arreglo floral para un evento q solo se yo que sera para mi pareja"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Telegram Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Define chatInput3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording1": {
+      "main": [
+        [
+          {
+            "node": "Define chatInput2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define chatInput2": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define chatInput3": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI3": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store3",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send an audio file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b878f33-3bba-42e8-bcd0-82b172484502",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6968e82e3be55e1efbdb459fc7ad36c979272d2d420b3c7ee9db3b73c4b67e3b"
+  },
+  "id": "QhBmDu8GxMj4zszo",
+  "tags": [
+    {
+      "createdAt": "2026-03-12T22:16:58.594Z",
+      "updatedAt": "2026-03-12T22:16:58.594Z",
+      "id": "I650CaDNCJUuI7d2",
+      "name": "Agente de voz"
+    },
+    {
+      "createdAt": "2026-03-12T15:00:52.282Z",
+      "updatedAt": "2026-03-12T15:00:52.282Z",
+      "id": "pTt1LlFim550dbqp",
+      "name": "MCP"
+    }
+  ]
+}

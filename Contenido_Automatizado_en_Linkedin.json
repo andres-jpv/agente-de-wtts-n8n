@@ -1,0 +1,423 @@
+{
+  "name": "Contenido Automatizado por Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                2
+              ],
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "7f5f9934-7ab8-43e9-a4cb-1583740a2e36",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        380,
+        240
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "Actúas como Asistente de Investigación de Contenidos en Agentic Vibe, una agencia de automatización con enfoque en inteligencia artificial. Nuestro objetivo es ayudar a solopreneurs, creadores de contenido y profesionales digitales a escalar su presencia online — especialmente en LinkedIn — mediante sistemas de contenido automatizados y personalizados.\n\nTu tarea es generar **ideas de contenido de alto valor**, alineadas con nuestros pilares estratégicos y diseñadas para resonar profundamente con nuestra audiencia. Estas ideas serán desarrolladas más adelante por otro agente en el flujo.\n\n👤 Cliente para este caso:\nUn exfuncionario bancario que ahora trabaja como **asesor financiero personal para familias de clase media en la Ciudad de México**. Su misión es ayudar a estas familias a manejar mejor su dinero, ahorrar, planificar el futuro y tomar decisiones financieras inteligentes. Tiene un tono cercano, profesional y empático.\n\n🔍 Temas sugeridos para idear contenido:\n- Consejos de finanzas personales para familias de clase media\n- Ahorro, presupuestos y uso inteligente del crédito en México\n- Independencia financiera, planificación para el retiro y economía del hogar\n- Psicología del dinero y hábitos financieros saludables\n- Errores financieros comunes y cómo evitarlos\n- Inversiones seguras para personas con ingresos modestos\n\n✅ Estructura esperada para cada idea (salida en formato JSON):\nPara cada idea, devuelve:\n- `title`: Título o idea central (máximo una línea)\n- `rationale`: 1 o 2 frases que expliquen por qué este tema es importante\n- `hook`: Un ángulo llamativo, estilo LinkedIn, que invite a leer o genere contraste\n\n🎯 Guía de estilo:\n- Las ideas deben ser útiles, claras y generar confianza\n- Puedes usar enfoques contraculturales o provocadores con tacto\n- Evita jergas técnicas; prioriza la empatía, la claridad y la aplicabilidad",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "928e2771-ec9f-48ff-b34e-9c3ab9c4a828",
+      "name": "Content topic generator2",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        720,
+        240
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "10577345-0f96-42bf-a5db-7f9f205f7359",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        720,
+        480
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "Yg0Suui5E3VvShOg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"title\": \"Cómo evitar el error financiero más común en México\",\n  \"rationale\": \"Muchas familias caen en este error por falta de educación financiera. Identificarlo a tiempo puede marcar la diferencia.\",\n  \"hook\": \"¿Te has preguntado por qué tantas personas terminan endeudadas sin saber cómo llegaron ahí?\"\n}"
+      },
+      "id": "c7094a20-a96a-4db8-9ee4-95f86de800ac",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        900,
+        460
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un creador de contenidos y redactor profesional enfocado en publicaciones para LinkedIn. Tu tarea es ayudar a transformar una idea en una publicación lista para compartir.\n\nA partir del siguiente título: {{ $json.output.title }}\nla justificación estratégica: {{ $json.output.rationale }},\ny el ángulo o gancho sugerido: {{ $json.output.hook }},\n\nRedacta un texto completo para una publicación en LinkedIn. Utiliza un tono profesional, claro y atractivo. Incluye un llamado a la acción final que invite a la reflexión o al diálogo en los comentarios.\n\nAdemás, sugiere una imagen que acompañe visualmente la publicación, con una breve descripción de lo que debería transmitir.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "id": "84b30f40-e7fa-4c46-9a82-39bbd2becfe0",
+      "name": "Content creator",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        1140,
+        240
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "6fdea8df-7cb4-4418-8dab-e5faa9e76b6b",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1140,
+        420
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "Yg0Suui5E3VvShOg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post title\": \"¿Cómo lograr estabilidad financiera sin ganar millones?\",\n  \"post content\": \"Muchas personas creen que para tener libertad financiera necesitan ingresos extraordinarios. Pero en realidad, se trata más de hábitos, estructura y visión a largo plazo. Hoy comparto tres principios clave que me han funcionado y que cualquier persona puede aplicar, sin importar su nivel de ingresos. ¿Te animás a intentarlo tú también? Dejame un comentario con tu experiencia o tu principal obstáculo.\",\n  \"image description\": \"Una familia de clase media reunida en la sala de su casa. Al fondo se ve un Toyota Corolla estacionado frente a una vivienda modesta de una planta, con fachada sencilla y un jardín pequeño. La madre está mostrando a sus hijos una hoja de cálculo en una laptop, mientras el padre observa con una sonrisa, dando la sensación de planificación y esperanza.\"\n}"
+      },
+      "id": "cc1e5e3c-31de-4d1b-948b-89165fbc9769",
+      "name": "Structured Output Parser1",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1300,
+        420
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúas como un especialista en SEO para publicaciones de LinkedIn. Tu tarea es generar hashtags altamente relevantes y efectivos para el siguiente contenido, tomando en cuenta:\n\n1. El tema principal: Finanzas personales para familias mexicanas de clase media.\n2. El público objetivo: Personas interesadas en organizar sus gastos, ahorrar en el hogar y aprovechar herramientas digitales como la inteligencia artificial.\n3. Las tendencias actuales en LinkedIn relacionadas con educación financiera, tecnología accesible y bienestar familiar.\n\npost title {{ $json.output['post title'] }}\npost content {{ $json.output['post content'] }}\n\nPor favor, genera:\n- 3 a 5 hashtags amplios y populares (como #Finanzas, #EducaciónFinanciera)\n- 3 a 5 hashtags específicos del nicho (como #IAparaAhorroFamiliar, #PresupuestoDigital, #FinanzasConChatGPT)\n- 1 o 2 hashtags de tendencias actuales (como #IAenLatinoamérica, #AhorroInteligente)\n\nDevuelve todos los hashtags como una lista separada por comas.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "f3901b98-cfe4-4d48-9e35-59161cbcfdd9",
+      "name": "Hashtag generator /SEO",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1640,
+        500
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "f3d91646-6d7b-4270-85bc-0e4684bbd0d0",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        1640,
+        700
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "Yg0Suui5E3VvShOg",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post title\": \"¿Cómo lograr estabilidad financiera sin ganar millones?\",\n  \"post content\": \"Muchas personas creen que para tener libertad financiera necesitan ingresos extraordinarios. Pero en realidad, se trata más de hábitos, estructura y visión a largo plazo. Hoy comparto tres principios clave que me han funcionado y que cualquier persona puede aplicar, sin importar su nivel de ingresos. ¿Te animás a intentarlo tú también? Dejame un comentario con tu experiencia o tu principal obstáculo.\",\n  \"image description\": \"Una familia de clase media reunida en la sala de su casa. Al fondo se ve un Toyota Corolla estacionado frente a una vivienda modesta de una planta, con fachada sencilla y un jardín pequeño. La madre está mostrando a sus hijos una hoja de cálculo en una laptop, mientras el padre observa con una sonrisa, dando la sensación de planificación y esperanza.\",\n  \"Hashtags\": [\"#FinanzasPersonales\", \"#EducaciónFinanciera\", \"#HábitosDeAhorro\", \"#PresupuestoFamiliar\", \"#FamiliasMexicanas\"]\n}"
+      },
+      "id": "692b1c2e-bdc7-474e-859e-204970f512a6",
+      "name": "Structured Output Parser2",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        1820,
+        700
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {},
+      "id": "f667d091-72aa-4bea-9648-4563a75265ff",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        2000,
+        240
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "sendTo": "j.pincayvinces@gmail.com",
+        "subject": "=📝 Post Semanal · {{ new Date().toLocaleDateString('es-MX', {weekday: 'long', day: 'numeric', month: 'long'}) }}",
+        "message": "=<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f3f2ef;margin:0;padding:20px}.card{background:#fff;max-width:600px;margin:0 auto;border-radius:8px;overflow:hidden;border:1px solid rgba(0,0,0,.1)}.badge{background:#0077b5;color:#fff;font-size:11px;padding:3px 10px;border-radius:12px;display:inline-block;font-weight:600}.name{font-weight:700;font-size:14px;color:#191919;margin:0}.tagline{font-size:12px;color:#555;margin:3px 0}.date{font-size:11px;color:#999}.content{font-size:14px;line-height:1.65;color:#191919;white-space:pre-wrap;padding:14px 16px}.hashtag{color:#0077b5;font-size:14px;font-weight:500;padding:0 16px 14px;display:block}.action{color:#555;font-size:13px;font-weight:600;margin-right:20px}</style></head><body><div class=\"card\"><div style=\"padding:12px 16px 10px\"><span class=\"badge\">📬 Contenido Semanal · Generado por IA</span></div><table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"padding:8px 16px 14px\"><tr><td width=\"54\" valign=\"top\"><div style=\"width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#0077b5,#00a0dc);color:#fff;font-weight:bold;font-size:22px;text-align:center;line-height:48px\">A</div></td><td style=\"padding-left:10px\" valign=\"top\"><p class=\"name\">Asesor Financiero</p><p class=\"tagline\">Finanzas personales · Ciudad de México</p><span class=\"date\">🌐 Publicación semanal automatizada</span></td></tr></table><div class=\"content\">{{ $json.text }}</div><span class=\"hashtag\">{{ $json.hashtags }}</span><div style=\"padding:10px 16px;border-top:1px solid #e0dfdf\"><span class=\"action\">👍 Me gusta</span><span class=\"action\">💬 Comentar</span><span class=\"action\">🔁 Compartir</span></div><div style=\"background:#f5f5f5;padding:10px 16px;border-top:1px solid #eee;font-size:12px;color:#999;text-align:center\">✨ Generado automáticamente por <strong>Agentic Vibe</strong> · n8n Automation</div></div></body></html>",
+        "options": {
+          "emailType": "html",
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "data"
+              }
+            ]
+          }
+        }
+      },
+      "id": "7c3a37b7-3227-43a7-86fb-c39e885570bf",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        2400,
+        240
+      ],
+      "typeVersion": 2.1,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputs = $input.all();\n\nlet imageData = null;\nlet textData = null;\n\nfor (const item of inputs) {\n  if (item.binary && item.binary.data) {\n    imageData = item;\n  } else if (item.json && item.json.output) {\n    textData = item;\n  }\n}\n\nif (!imageData || !textData) {\n  throw new Error(\"Faltan datos necesarios: imagen o texto.\");\n}\n\n// Formatear los hashtags como texto, separados por espacio\nconst hashtags = (textData.json.output.Hashtags || []).join(\" \");\n\nreturn [\n  {\n    json: {\n      text: textData.json.output[\"post content\"],\n      hashtags: hashtags\n    },\n    binary: {\n      data: imageData.binary.data\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2220,
+        240
+      ],
+      "id": "5783b141-cb46-41ba-afb3-27e486122d9f",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "prompt": "=Genera una imagen de calidad fotográfica para un post en LinkedIn. La descripción de la imagen es la siguiente: {{ $json.output['image description'] }}. \nPor favor, asegúrate de que la imagen luzca realista y profesional, adecuada para LinkedIn. \nDebe mostrar personas reales —como una familia latinoamericana de clase media, o un individuo reflexionando o celebrando un logro financiero— según el contenido descrito. \nEvita elementos caricaturescos o irreales. La escena debe ser emocionalmente auténtica, empática y visualmente limpia. ",
+        "options": {}
+      },
+      "id": "2ae88f2a-031c-41c3-bbb9-f1555d94863a",
+      "name": "Generate an image",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "position": [
+        1640,
+        60
+      ],
+      "typeVersion": 1.8,
+      "credentials": {
+        "openAiApi": {
+          "id": "Yg0Suui5E3VvShOg",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content creator": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Hashtag generator /SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Content topic generator2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content topic generator2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Content creator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Hashtag generator /SEO",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hashtag generator /SEO": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Content topic generator2": {
+      "main": [
+        [
+          {
+            "node": "Content creator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Content topic generator2",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Content creator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Hashtag generator /SEO",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "a9bca7fd-e1d1-44bc-a724-8aec6178662a",
+  "meta": {
+    "templateId": "4968",
+    "instanceId": "7254d6e5791ed3167775f6d7431189dafac8c157c00bb7a09cb5470586a84b8d"
+  },
+  "id": "k43pxCCCjspjxCdu",
+  "tags": []
+}
