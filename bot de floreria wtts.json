@@ -1,0 +1,1375 @@
+{
+  "name": "bot de floreria wtts",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "floreria-bsas",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        288
+      ],
+      "id": "97d41ef1-edb6-4883-86c4-22ca9a82be6e",
+      "name": "Webhook",
+      "webhookId": "f1a2b3c4-1111-4000-8000-aaaaaaaaaaaa"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0010001-0001-4000-8000-000000000001",
+              "name": "Numero_Telefono",
+              "value": "={{ $json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", \"\")}}",
+              "type": "string"
+            },
+            {
+              "id": "a0010001-0001-4000-8000-000000000002",
+              "name": "Nombre",
+              "value": "={{ $json.body.data.pushName }}",
+              "type": "string"
+            },
+            {
+              "id": "a0010001-0001-4000-8000-000000000003",
+              "name": "Mensaje",
+              "value": "={{ $json.body.data.message.conversation }}",
+              "type": "string"
+            },
+            {
+              "id": "a0010001-0001-4000-8000-000000000004",
+              "name": "Tipo_Mensaje",
+              "value": "={{ $json.body.data.messageType }}",
+              "type": "string"
+            },
+            {
+              "id": "a0010001-0001-4000-8000-000000000005",
+              "name": "Instancia",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            },
+            {
+              "id": "a0010001-0001-4000-8000-000000000006",
+              "name": "ID",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        288
+      ],
+      "id": "3bd79215-7979-41c8-95f4-a9bef5b7f81e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Tipo_Mensaje }}",
+                    "rightValue": "conversation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-0001-0001-0001-000000000001"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Mensaje Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cond-0001-0001-0001-000000000002",
+                    "leftValue": "={{ $json.Tipo_Mensaje }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Mensaje de Voz"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cond-0001-0001-0001-000000000003",
+                    "leftValue": "={{ $json.Tipo_Mensaje }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Mensaje Imagen"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        16,
+        272
+      ],
+      "id": "79f5a2f1-c1c2-4f24-b57d-7152aaf9d324",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $json.Numero_Telefono }}",
+        "messageData": "={{ JSON.stringify({\n      message   : $json.Mensaje || $json[\"texto-voz\"],\n      sessionID : $node[\"Webhook\"].json.body.data.key.id,\n      date_time : $node[\"Webhook\"].json.body.data.messageTimestamp.toDateTime('s')\n}) }}\n",
+        "tail": true
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        240,
+        192
+      ],
+      "id": "ff0c8d8d-435f-4c47-9896-b7062553e889",
+      "name": "Redis3",
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "Mensaje",
+        "key": "={{ $('Edit Fields').item.json.Numero_Telefono }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        464,
+        192
+      ],
+      "id": "3e7aa08b-8755-45d4-aa8d-67ef037ae0a2",
+      "name": "Redis4",
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse(\n  $json.Mensaje\n    .filter(m => m.trim().startsWith('{'))\n    .slice(-1)[0]\n    .split('||')[0]\n    .trim()\n).sessionID }}\n",
+                    "rightValue": "={{ String($node[\"Redis3\"].json.ID).trim() }}\n",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "cond-0002-0001-0001-000000000001"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Ignoran"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "cond-0002-0001-0001-000000000002",
+                    "leftValue": "={{ DateTime.fromISO(JSON.parse($json.Mensaje.filter(m => m.trim().startsWith('{')).slice(-1)[0].split('||')[0].trim()).date_time) }}\n",
+                    "rightValue": "={{ $now.minus(7, 'seconds').toLocal() }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Continuamos"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Esperar"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        688,
+        80
+      ],
+      "id": "55bcca8a-2b05-4cfb-bd3f-88678035b9d2",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -128
+      ],
+      "id": "6c422998-814f-470c-b5c6-720254a377a9",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        288
+      ],
+      "id": "f0fb3f74-3325-4d8d-9fef-1ed54ad651d3",
+      "name": "Wait3",
+      "webhookId": "f1a2b3c4-2222-4000-8000-aaaaaaaaaaaa"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Edit Fields').item.json.Numero_Telefono }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        912,
+        64
+      ],
+      "id": "5281fd88-8e89-4e44-bc72-ef8ad8b435cd",
+      "name": "Redis5",
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0020001-0001-4000-8000-000000000001",
+              "name": "mensaje",
+              "value": "={{ $json.Mensaje.map(m => JSON.parse(m).message).join('\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        64
+      ],
+      "id": "ef30b985-176f-437b-a2a3-433c1ee51391",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0030001-0001-4000-8000-000000000001",
+              "name": "mensaje_audio",
+              "value": "={{ $('Webhook').item.json.body.data.message.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        496
+      ],
+      "id": "a8d5dfc5-8e8d-4b7e-9487-cc9fcd50f311",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "mensaje_audio",
+        "options": {
+          "mimeType": "audio/mp3"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        496
+      ],
+      "id": "04a260ef-a3f5-4aca-9b2a-9a319c8f9e31",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        912,
+        496
+      ],
+      "id": "0b918ac0-c9ac-4ffd-8b50-a67d6eac481e",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0040001-0001-4000-8000-000000000001",
+              "name": "mensaje",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        496
+      ],
+      "id": "ca1bd88e-bfc1-431c-a7bd-273c6d7b0219",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1360,
+        272
+      ],
+      "id": "bc2dd669-e8fe-4240-b057-2d5b56626fa3",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.mensaje }}",
+        "options": {
+          "systemMessage": "=Eres Flor, una agente conversacional virtual de voz clara, amable y confiable, representante de la Floristería \"Flor de Buenos Aires\".\nTu estilo es cálido, profesional y cercano, como el de una asesora de tienda que ayuda al cliente a elegir el mejor arreglo floral para cada ocasión.\n\nEstás entrenada con un catálogo estandarizado de 7 productos florales, con información sobre nombre, descripción, ocasión, disponibilidad, tiempo de entrega y cobertura de servicio.\nSabes que la floristería ofrece entregas sin costo adicional dentro de:\n\nCiudad de Buenos Aires (antes \"CABA\") – zona central de la capital argentina.\n\nGran Buenos Aires (antes \"GBA\") – localidades metropolitanas cercanas a la ciudad.\n\nNota: Aunque el texto de tu base de conocimiento puede incluir los acrónimos CABA y GBA, debes sustituirlos siempre por \"Ciudad de Buenos Aires\" o \"Gran Buenos Aires\" al hablar, para sonar natural y profesional.\n\nAl iniciar la conversación, preséntate siempre, por ejemplo:\n\"Hola, soy Flor, tu asistente virtual de la Floristería Flor de Buenos Aires. Estoy aquí para ayudarte a elegir el arreglo ideal. ¿Podrías darme tu nombre y contarme para qué ocasión necesitas el arreglo?\"\n\nCon el nombre proporcionado, debes utilizarlo en cada interacción, creando una experiencia personalizada y cercana.\n\nPor el momento, tu función es únicamente informativa y de recomendación, ayudando a los usuarios a conocer los productos y sugerir opciones según la ocasión indicada.\nNo brindas precios ni gestionas pedidos en esta etapa.\nTus respuestas deben ser breves y claras, como máximo 30 segundos de duración, equivalentes a unas 70 palabras.\nCuando un cliente describe la ocasión (ejemplo: cumpleaños, funeral, aniversario), sugieres uno de los productos del catálogo que encaje mejor, explicando brevemente su estilo, flores principales y ocasión recomendada.\n\nSi la pregunta está fuera del catálogo o no tienes información específica, responde con amabilidad:\n\"Por el momento solo puedo brindar información sobre nuestros arreglos del catálogo. ¿Te gustaría que te recomiende uno para la ocasión que necesitas?\"\n\nMantén siempre un tono cordial, servicial y confiable, como el de una florista profesional ayudando a un cliente a elegir el detalle perfecto."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1616,
+        288
+      ],
+      "id": "ef2f8a25-4282-4b1e-8e13-b595da1c55ae",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {
+          "maxTokens": -1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        512
+      ],
+      "id": "54a9b0c1-a85c-4734-ae87-4734682620fb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.Numero_Telefono }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        512
+      ],
+      "id": "0ac96158-395b-4e38-9473-36f5fc49a7cb",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "fTHqNTmZX7gpkj4C",
+          "name": "Credencial Postgres "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Base vectorizada del Catálogo de Productos de la Floristería Flor de Buenos Aires",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1840,
+        512
+      ],
+      "id": "8fdd1dc8-ca90-42d9-b1ee-d79691e37143",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "EttUngnjttbWiInI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1936,
+        720
+      ],
+      "id": "2dfd93a1-08d6-4fb1-a521-8fe132240693",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        192
+      ],
+      "id": "3ddaec1f-9a4e-4064-a08f-481e6f709cb9",
+      "name": "Marcar mensajes como leidos",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "messageText": "={{ $('AI Agent').item.json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2688,
+        192
+      ],
+      "id": "60760b7e-961a-4887-94ec-438fe283fdbb",
+      "name": "Enviar texto",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "integrations-api",
+        "operation": "evolution-bot",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "resourceForEvolutionBot": "changeStatusEvolutionBot",
+        "evolutionBotId": "={{ $('Webhook').item.json.body.data.key.id }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "status": "closed"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        192
+      ],
+      "id": "183329c3-3114-4c2c-8a49-0760a99248c5",
+      "name": "Evolution bot",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/text-to-speech/4wDRKlxcHNOFO5kBvE81",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "0595397ff25ea37f4f6975e0f10d5a92780ef89b47526cc8cda3b4204e44ee6a"
+            },
+            {
+              "name": "Accept",
+              "value": "audio/mpeg"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": {{ JSON.stringify($json.output.replace(/\\n+/g, ' ').replace(/^=+/, '').replace(/^\\s*claro[,:-]?\\s*/i, '').trim()) }},\n  \"model_id\": \"eleven_multilingual_v2\",\n  \"voice_settings\": {\n    \"stability\": 0.45,\n    \"similarity_boost\": 0.8,\n    \"style\": 0.25,\n    \"use_speaker_boost\": true\n  }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        384
+      ],
+      "id": "6422e3dc-8fef-4995-970f-57d26d308943",
+      "name": "HTTP Request ElevenLabs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  item.json.audioBase64 = item.binary.data.data;\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        384
+      ],
+      "id": "0af7456e-4d79-436a-95ef-8b2006894c8d",
+      "name": "Code Audio Base64"
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-audio",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "media": "={{ $json.audioBase64 }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        384
+      ],
+      "id": "017e8e95-4917-4307-b752-37d513d31ff5",
+      "name": "Enviar Audio WhatsApp",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Q6gBEPNyn70RM-X9Mn30jqgUbxVhCPEB",
+          "mode": "list",
+          "cachedResultName": "Catálogo+Flor+de+Buenos+Aires.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Q6gBEPNyn70RM-X9Mn30jqgUbxVhCPEB/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -640,
+        832
+      ],
+      "id": "82f27f89-0a73-4ae9-8ccf-d99930dd46ee",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "LUxKb4dEY7rFJXjx",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        832
+      ],
+      "id": "354bf1dd-d1e2-483d-91cb-eee8e2850231",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "EttUngnjttbWiInI",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        1056
+      ],
+      "id": "7a52f1e8-ac8f-49d3-9f57-e5c133e18457",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "loader": "pdfLoader",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        1056
+      ],
+      "id": "078e965d-ca0f-4a31-8dc6-25100e69d71a",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.Tipo_Mensaje }}",
+                    "rightValue": "conversation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-resp-0001-0001-000000000001"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Respuesta Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Edit Fields').item.json.Tipo_Mensaje }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cond-resp-0001-0001-000000000002"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Respuesta Audio"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Respuesta Texto"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2240,
+        272
+      ],
+      "id": "2040c0d4-169d-423e-bbdf-e42964620add",
+      "name": "Switch Respuesta"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "messageId": "={{ $('Webhook').item.json.body.data.key.id }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        3136,
+        384
+      ],
+      "id": "8bbf13de-03ff-4f9c-9c26-12adf39e20dd",
+      "name": "Marcar leidos2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "integrations-api",
+        "operation": "evolution-bot",
+        "instanceName": "={{ $('Webhook').item.json.body.instance }}",
+        "resourceForEvolutionBot": "changeStatusEvolutionBot",
+        "evolutionBotId": "={{ $('Webhook').item.json.body.data.key.id }}",
+        "remoteJid": "={{ $('Webhook').item.json.body.data.key.remoteJid.replaceAll(\"@s.whatsapp.net\", '') }}",
+        "status": "closed"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        3360,
+        384
+      ],
+      "id": "f6bb77a4-abea-43f1-8c6c-ddfa01c39fda",
+      "name": "Evolution bot2",
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Agente Voz WhatsApp\n",
+        "height": 1180,
+        "width": 3100,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "b5917480-87e9-40c5-83b2-01a4e990cc84",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Cargar la Base Vectorial\n",
+        "height": 500,
+        "width": 1100
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -944,
+        704
+      ],
+      "typeVersion": 1,
+      "id": "d279047d-7f46-456c-8a6b-65c2980c8f1a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Redis Message Batching\nAcumula mensajes del mismo usuario y espera 7s antes de procesarlos juntos.",
+        "height": 500,
+        "width": 1000,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "502867b3-7825-4e33-818a-95849c42f31f",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2a2cd712-4476-4123-b1f9-4b44ebeda136",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -432,
+        288
+      ],
+      "id": "b798585a-ca14-4999-b747-a871cd20548d",
+      "name": "Filter"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Redis3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis3": {
+      "main": [
+        [
+          {
+            "node": "Redis4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis4": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Redis4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Marcar mensajes como leidos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request ElevenLabs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Marcar mensajes como leidos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar mensajes como leidos": {
+      "main": [
+        [
+          {
+            "node": "Enviar texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar texto": {
+      "main": [
+        [
+          {
+            "node": "Evolution bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Code Audio Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Audio Base64": {
+      "main": [
+        [
+          {
+            "node": "Enviar Audio WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Audio WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Marcar leidos2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar leidos2": {
+      "main": [
+        [
+          {
+            "node": "Evolution bot2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c34c03ee-5cef-42dd-a8a9-82bc69457aab",
+  "meta": {
+    "instanceId": "6968e82e3be55e1efbdb459fc7ad36c979272d2d420b3c7ee9db3b73c4b67e3b"
+  },
+  "id": "KoErmur8kdsK30Yj",
+  "tags": [
+    {
+      "createdAt": "2026-03-12T15:00:52.282Z",
+      "updatedAt": "2026-03-12T15:00:52.282Z",
+      "id": "pTt1LlFim550dbqp",
+      "name": "MCP"
+    },
+    {
+      "createdAt": "2026-03-12T22:16:58.594Z",
+      "updatedAt": "2026-03-12T22:16:58.594Z",
+      "id": "I650CaDNCJUuI7d2",
+      "name": "Agente de voz"
+    }
+  ]
+}
