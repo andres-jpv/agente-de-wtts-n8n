@@ -1,0 +1,1772 @@
+{
+  "name": "JARVIS - Chatbot CV Jordan",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## WhatsApp Multimodal AI Assistant\n\nA complete AI-powered WhatsApp assistant that handles text, audio, images, and documents. Features message queuing, conversation memory, and smart response formatting.\n\n### How it works\n1. Receives WhatsApp messages via Evolution API webhook\n2. Classifies message type (text, audio, image, document)\n3. Processes media with OpenAI (transcription/vision)\n4. Queues messages in Redis (waits for more messages)\n5. AI Agent generates response with conversation memory\n6. Formats long responses into multiple WhatsApp messages\n7. Sends replies with natural typing delays\n\n### Setup steps\n- [ ] Install Evolution API community node\n- [ ] Set up Evolution API + connect WhatsApp\n- [ ] Configure Redis instance\n- [ ] Configure PostgreSQL database\n- [ ] Add OpenAI API credentials\n- [ ] Set up webhook in Evolution API\n- [ ] Replace `YOUR_ALLOWED_NUMBER` placeholder\n\n### Customization\n- Modify AI Agent system prompt\n- Adjust message wait time (default: 10s)\n- Change response formatting rules\n- Add more message type handlers",
+        "height": 860,
+        "width": 460
+      },
+      "id": "8c128002-cfbb-44a6-96f4-b2827f103bf9",
+      "name": "Main Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## ⚠️ Requirements & Setup\n\n**Services needed:**\n- Evolution API (v2.2+)\n- Redis (for message queuing)\n- PostgreSQL (for chat memory)\n- OpenAI API key\n\n**Community Node:**\n```\nn8n-nodes-evolution-api\n```\n\n**Webhook Setup:**\n1. Copy the webhook URL from \"Receive WhatsApp\" node\n2. In Evolution API → Instance → Webhook\n3. Enable: `MESSAGES_UPSERT`\n\n**Credentials to configure:**\n1. Evolution API (server URL + API key)\n2. OpenAI API\n3. Redis connection\n4. PostgreSQL connection",
+        "height": 552,
+        "width": 688,
+        "color": 2
+      },
+      "id": "f7730fcf-9445-45e5-83c8-8012d947183e",
+      "name": "Warning - Setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        240
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 1. Receive & Parse Message",
+        "height": 280,
+        "width": 700,
+        "color": 6
+      },
+      "id": "487bb63e-0e8a-40b2-ab53-10244bf15aa6",
+      "name": "Section 1 - Receive",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 2. Mark as Read",
+        "height": 280,
+        "width": 220,
+        "color": 6
+      },
+      "id": "d00d5097-8365-40b9-ac5d-4b76401dd904",
+      "name": "Section 2 - Mark Read",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1568,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 3. Route by Message Type",
+        "height": 600,
+        "width": 280
+      },
+      "id": "d16d161b-587a-43a1-b0ea-e4d9e88cf968",
+      "name": "Section 3 - Router",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1808,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 4. Process Media\n\nHandles audio transcription, image analysis, and document extraction",
+        "height": 1112,
+        "width": 900
+      },
+      "id": "dcf4d4a0-13f4-48d5-8d93-85e2cb3a3d00",
+      "name": "Section 4 - Media Processing",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2112,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 5. Message Queue\n\nAccumulates messages and waits for more input",
+        "height": 280,
+        "width": 700,
+        "color": 5
+      },
+      "id": "40d9822b-c29a-4ea6-a87a-ecff5079d5c4",
+      "name": "Section 5 - Queue",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3024,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 6. Check & Concatenate",
+        "height": 552,
+        "width": 460
+      },
+      "id": "65d937bb-f226-4e38-9333-98833328079f",
+      "name": "Section 6 - Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3744,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 7. AI Processing",
+        "height": 560,
+        "width": 460,
+        "color": 4
+      },
+      "id": "1c7c6e0b-3aba-4e6c-a95c-b571f7298182",
+      "name": "Section 7 - AI",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4224,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 8. Format Response",
+        "height": 560,
+        "width": 500,
+        "color": 5
+      },
+      "id": "f4603ab4-f3b7-4225-bf69-51d56d1993d1",
+      "name": "Section 8 - Format",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        4704,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## 9. Send Messages",
+        "height": 560,
+        "width": 908,
+        "color": 5
+      },
+      "id": "e3667040-5b2e-4e01-8806-f379f79ba02b",
+      "name": "Section 9 - Send",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        5232,
+        816
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-multimodal",
+        "options": {}
+      },
+      "id": "90c5d404-116e-4e4e-ba58-f2a548830ea4",
+      "name": "Receive WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        880,
+        960
+      ],
+      "webhookId": "whatsapp-multimodal",
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5eedc085-015a-4d90-8062-bb51eaa31a24",
+              "name": "event",
+              "type": "string",
+              "value": "={{ $json.body.event }}"
+            },
+            {
+              "id": "3d1a50e0-8d92-423a-9f68-70c7c76ac1a8",
+              "name": "instance",
+              "type": "string",
+              "value": "={{ $json.body.instance }}"
+            },
+            {
+              "id": "17f79a1a-b4b1-42bf-b7f7-4ee12f97bf8c",
+              "name": "remoteJid",
+              "type": "string",
+              "value": "={{ $json.body.data.key.remoteJid }}"
+            },
+            {
+              "id": "0a88668a-cb3b-4fd2-acc5-ec6c2845c748",
+              "name": "messageId",
+              "type": "string",
+              "value": "={{ $json.body.data.key.id }}"
+            },
+            {
+              "id": "ca85475e-ce06-4a85-85a3-01935200b5c0",
+              "name": "pushName",
+              "type": "string",
+              "value": "={{ $json.body.data.pushName }}"
+            },
+            {
+              "id": "989bd4f8-9691-477f-a4ad-13b061b211b4",
+              "name": "messageText",
+              "type": "string",
+              "value": "={{ $json.body.data.message.conversation }}"
+            },
+            {
+              "id": "d5579d0b-f240-495a-a51e-d17e60758401",
+              "name": "messageType",
+              "type": "string",
+              "value": "={{ $json.body.data.messageType }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b05c042f-1f78-4437-9135-e0a9fce6c28b",
+      "name": "Parse Message Data",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        1056,
+        960
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "14910c39-b162-4553-b4a6-b24ea1145f4d",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.remoteJid }}",
+              "rightValue": "YOUR_PHONE_NUMBER@s.whatsapp.net"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "74b0321b-37b1-4e48-b256-4c4522ba2743",
+      "name": "Filter Allowed Numbers",
+      "type": "n8n-nodes-base.filter",
+      "position": [
+        1232,
+        960
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "c5178e1e-e8e8-4c7c-a3f6-837732e5b854",
+      "name": "Wait 2s",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        1392,
+        960
+      ],
+      "webhookId": "wait-initial",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Parse Message Data').item.json.instance }}",
+        "remoteJid": "={{ $('Filter Allowed Numbers').item.json.remoteJid }}",
+        "messageId": "={{ $('Parse Message Data').item.json.messageId }}"
+      },
+      "id": "593f7126-07b5-4317-ada0-bb30278a179d",
+      "name": "Mark as Read",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "position": [
+        1632,
+        960
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Message Data').item.json.messageType }}",
+                    "rightValue": "conversation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  },
+                  {
+                    "leftValue": "={{ $('Parse Message Data').item.json.messageType }}",
+                    "rightValue": "extendedTextMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "or"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Message Data').item.json.messageType }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Message Data').item.json.messageType }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Message Data').item.json.messageType }}",
+                    "rightValue": "documentMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Document"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "e4c8adab-9fa3-4a8f-828c-9e1837f9d6c2",
+      "name": "Route by Message Type",
+      "type": "n8n-nodes-base.switch",
+      "position": [
+        1872,
+        1008
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9955c458-ed6f-4ecf-acbc-fca42cf6c0e0",
+              "name": "input",
+              "type": "string",
+              "value": "={{ $('Parse Message Data').item.json.messageText }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2cd0b0b0-0fc5-4684-a11f-9e24998f0ed3",
+      "name": "Extract Text",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2160,
+        960
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c10a7a40-6a77-4ea6-b3a6-09994174185e",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $('Receive WhatsApp').item.json.body.data.message.base64 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "04fc4b12-a063-441a-98af-a0da75876265",
+      "name": "Extract Audio Base64",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2160,
+        1120
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "fileName": "audio.wav",
+          "mimeType": "audio/wav"
+        }
+      },
+      "id": "b79ea581-3f2e-4b71-bc96-5e7a096ee5ba",
+      "name": "Convert to Audio",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2368,
+        1120
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "model",
+              "value": "whisper-1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "df09d6a8-e72b-4722-96d6-94f45da84065",
+      "name": "Transcribe Audio",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2560,
+        1120
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37faec8b-0774-48f6-9c3c-e7b2de2d967e",
+              "name": "input",
+              "type": "string",
+              "value": "=<audio>\n{{ $json.text }}\n</audio>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1c20d663-5ec9-4489-a0e4-fe64e1187efb",
+      "name": "Format Audio Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2848,
+        1120
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c10a7a40-6a77-4ea6-b3a6-09994174185e",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $('Receive WhatsApp').item.json.body.data.message.base64 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "44622f9a-69ba-4ce3-845f-8d0017aebd1b",
+      "name": "Extract Image Base64",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2160,
+        1280
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "mimeType": "image/png"
+        }
+      },
+      "id": "7c5b84ee-d208-470c-96d4-1fd7cea7c464",
+      "name": "Convert to Image",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2368,
+        1280
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\"type\": \"text\", \"text\": \"Describe esta imagen en detalle. Incluye todo el texto visible, objetos y cualquier información relevante.\"},\n        {\"type\": \"image_url\", \"image_url\": {\"url\": \"data:image/png;base64,{{ $json.data }}\"}}\n      ]\n    }\n  ],\n  \"max_tokens\": 1000\n}",
+        "options": {}
+      },
+      "id": "e777504c-5309-4f6f-bde4-0b6213a5f670",
+      "name": "Analyze Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2560,
+        1280
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37faec8b-0774-48f6-9c3c-e7b2de2d967e",
+              "name": "input",
+              "type": "string",
+              "value": "=<image>\n{{ $json.choices[0].message.content }}\n</image>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "02044d71-cd50-465e-bee7-4818aecdf0c0",
+      "name": "Format Image Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2848,
+        1280
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c10a7a40-6a77-4ea6-b3a6-09994174185e",
+              "name": "data",
+              "type": "string",
+              "value": "={{ $('Receive WhatsApp').item.json.body.data.message.base64 }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b8600bc0-0b1d-4841-b6df-739ed8491ffa",
+      "name": "Extract Document Base64",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2160,
+        1456
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "options": {
+          "fileName": "={{ $('Receive WhatsApp').item.json.body.data.message.documentMessage.fileName }}",
+          "mimeType": "={{ $('Receive WhatsApp').item.json.body.data.message.documentMessage.mimetype }}"
+        }
+      },
+      "id": "521a8ade-92cc-4bab-bda1-600b03c03bb8",
+      "name": "Convert to Document",
+      "type": "n8n-nodes-base.convertToFile",
+      "position": [
+        2368,
+        1456
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\"type\": \"text\", \"text\": \"Extrae y transcribe TODO el contenido de texto de este documento. Preserva la estructura.\"},\n        {\"type\": \"image_url\", \"image_url\": {\"url\": \"data:{{ $('Receive WhatsApp').item.json.body.data.message.documentMessage.mimetype }};base64,{{ $json.data }}\"}}\n      ]\n    }\n  ],\n  \"max_tokens\": 2000\n}",
+        "options": {}
+      },
+      "id": "fc1371f6-8145-442a-adc7-e5d5d83f8edb",
+      "name": "Transcribe Document",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2560,
+        1456
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37faec8b-0774-48f6-9c3c-e7b2de2d967e",
+              "name": "input",
+              "type": "string",
+              "value": "=<document>\n{{ $json.choices[0].message.content }}\n</document>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "399ce9c1-75e5-4c8b-88a5-0d1199591c6c",
+      "name": "Format Document Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2848,
+        1456
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Parse Message Data').item.json.instance }}",
+        "remoteJid": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "messageText": "Sorry, I cannot process this type of message yet.",
+        "options_message": {}
+      },
+      "id": "11f24afb-0c38-42fc-ad90-fd867bc091e3",
+      "name": "Send Unsupported Message",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "position": [
+        2160,
+        1616
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9e05c41a-606a-4b1a-afe9-2dcf0a9d359d",
+      "name": "End Unsupported",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        2368,
+        1616
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "883d64de-2247-4517-8441-7cadb0144094",
+              "name": "input",
+              "type": "string",
+              "value": "={{ $json.input }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a6648daa-9245-435f-a2be-9783552fdc7a",
+      "name": "Unify Input",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        3072,
+        960
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "messageData": "={{ $json.input }}",
+        "tail": true
+      },
+      "id": "8b0a5ff5-951e-40e0-9c2f-b44e77787923",
+      "name": "Queue Message",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        3248,
+        960
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "id": "75b189d0-e531-4f45-a8bd-58d024fe6934",
+      "name": "Wait for More Messages",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        3424,
+        960
+      ],
+      "webhookId": "wait-for-more",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "options": {}
+      },
+      "id": "c6c22a3c-1924-42ce-b447-b2a2615b0c7f",
+      "name": "Get Queued Messages",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        3584,
+        960
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "682da6df-4a15-4231-b2b0-a3088b7201f0",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "leftValue": "={{ $json.propertyName.last() }}",
+              "rightValue": "={{ $('Unify Input').item.json.input }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c375b291-1de4-4a56-8139-e90769ccd4d6",
+      "name": "Is Last Message?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        3808,
+        960
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {},
+      "id": "cc188604-fcb1-4d7d-ac9c-cf12f8ca65e0",
+      "name": "Not Last - Stop",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        4064,
+        1120
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "efcf87b7-6819-4aff-b48d-ca4edd2a0a5a",
+              "name": "finalInput",
+              "type": "string",
+              "value": "={{ $json.propertyName.join('\\n') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e22f71f-c289-4787-8378-d81850147c4c",
+      "name": "Concatenate Messages",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        4064,
+        864
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.finalInput }}",
+        "options": {
+          "systemMessage": "Eres J.A.R.V.I.S., el asistente de inteligencia artificial personal de Jordan Pincay. Tu rol es atender a reclutadores, entrevistadores o cualquier persona interesada en conocer el perfil profesional de Jordan. Hablas con personalidad: eres elegante, ingenioso, con un toque de humor sutil (como el Jarvis de Iron Man), pero siempre profesional.\n\n## Sobre Jordan\n- Nombre completo: Jordan Andres Pincay Vinces\n- Ubicación: Guayaquil, Ecuador\n- Rol: Desarrollador Backend Odoo & Automatización IA (Junior)\n- LinkedIn: linkedin.com/in/jpincayvinces\n- GitHub: github.com/andres-jpv\n\n## Habilidades técnicas\n- Odoo ERP (v18/19): módulos custom, herencia de modelos, vistas XPath, reportes QWeb, ORM API, Smart Buttons, Wizards (TransientModel)\n- Migraciones Odoo 18 → 19 (refactorización de sintaxis deprecada)\n- Python (decoradores @api.depends, @api.constrains, @api.onchange)\n- PostgreSQL, Docker/DevContainers, Git, Linux Server Admin\n- n8n: flujos de automatización, chatbots multimodales (voz, imagen, texto), agentes RAG con Supabase/Pinecone\n- Integraciones: WhatsApp (Evolution API), Telegram, Chatwoot, ElevenLabs TTS, MCP\n\n## Experiencia\n1. Desarrollador Odoo Junior - Freelance (May 2025 - presente)\n   - Módulos completos: modelos, vistas, seguridad, reportes QWeb, secuencias\n   - Lógica de negocio con decoradores y ORM\n   - Migración de módulos Odoo 18 → 19\n   - Entornos con Docker/DevContainers\n   - Scripts de restauración automatizada de backups con PostgreSQL\n\n2. Pasante de Sistemas - Grupo DIFARE (Feb 2025 - Mar 2025)\n   - Formateo e instalación de SO y software\n   - Diagnóstico y reparación de hardware\n   - Gestión de inventario de equipos informáticos\n\n## Proyectos destacados\n1. Sistema de Gestión Bibliotecaria (Odoo): modelado relacional completo, Wizards para renovación masiva, seguridad por roles, reportes PDF con QWeb\n2. Sale.order - Extensión de Ventas: herencia de modelos, selectores XPath, Smart Buttons con campos computados\n3. Automatización con n8n: chatbots multimodales WhatsApp/Telegram, agentes RAG, escalamiento bot-a-humano con Chatwoot\n\n## Educación\n- Bachiller Técnico en Informática - Academia Naval Almirante Illingworth (2020-2026)\n\n## Certificaciones\n- Curso Técnico de Programación Odoo Backend - Campus Cleverit (2025)\n- Agentes de IA con n8n - Udemy (2025)\n- N8N Intermedio: Chatbots IA con Evolution y Chatwoot - Udemy (2025)\n\n## Reglas de comportamiento\n1. Responde siempre en el idioma en que te escriban (español por defecto)\n2. Sé conciso, esto es WhatsApp, no un email\n3. Si preguntan algo que no está en la info de Jordan, di algo como: 'Eso tendría que consultarlo directamente con Jordan, pero puedo agendarles una llamada si gustan'\n4. Si preguntan por disponibilidad o salario, responde: 'Jordan está abierto a conversarlo, ¿les parece si coordinamos una llamada?'\n5. Muestra entusiasmo genuino por el perfil de Jordan sin ser arrogante\n6. Si mandan audio (<audio> tags), imagen (<image> tags) o documento (<document> tags), procésalo naturalmente y responde en contexto\n7. Este mismo chatbot es prueba viviente de las habilidades de Jordan en automatización con n8n y Evolution API. Si es relevante, menciónalo con naturalidad.\n\n## Flujo de menú principal\nCuando el usuario inicie la conversación o escriba 'menu', 'inicio', 'hola' o cualquier saludo, responde EXACTAMENTE con este mensaje:\n\n'Hola, soy *J.A.R.V.I.S.* 🤖, el asistente personal de *Jordan Pincay*.\n\nSeleccione una opción para conocer más sobre su perfil:\n\n1️⃣ Experiencia laboral\n2️⃣ Habilidades técnicas\n3️⃣ Proyectos destacados\n4️⃣ Certificaciones y educación\n5️⃣ Agendar una llamada con Jordan\n\nEscriba el *número* de la opción que desee.'\n\n## Respuestas por opción\n\n### Si escriben 1 o 'experiencia':\nResponde con la experiencia laboral de Jordan de forma resumida y atractiva. Menciona su rol actual como Dev Odoo Freelance y su pasantía en Grupo DIFARE. Al final di: 'Escriba *menu* para volver al inicio o pregunte lo que desee.'\n\n### Si escriben 2 o 'habilidades':\nResponde con sus habilidades técnicas organizadas en dos bloques: Framework/Backend y Ecosistema/DevOps+IA. Al final di: 'Escriba *menu* para volver al inicio o pregunte lo que desee.'\n\n### Si escriben 3 o 'proyectos':\nResponde con los 3 proyectos destacados: Library App, Sale.order Extension y Automatización con n8n. Describe cada uno en 1-2 líneas. Al final di: 'Escriba *menu* para volver al inicio o pregunte lo que desee.'\n\n### Si escriben 4 o 'certificaciones' o 'educación':\nResponde con su educación (Bachiller Técnico en Informática) y sus 3 certificaciones. Al final di: 'Escriba *menu* para volver al inicio o pregunte lo que desee.'\n\n### Si escriben 5 o 'llamada' o 'agendar':\nResponde: 'Excelente decisión. Puede contactar a Jordan directamente por:\n\n📱 WhatsApp: +YOUR_PHONE_NUMBER\n💼 LinkedIn: linkedin.com/in/jpincayvinces\n🐙 GitHub: github.com/andres-jpv\n\nJordan estará encantado de conversar con usted.'\n\n### Si escriben 6 o 'portafolio' o 'web' o 'portfolio':\\nResponde: 'Puede explorar el portafolio completo de Jordan aquí:\\n\\n🌐 *https://andresdeveloper.xyz/*\\n\\nAhí encontrará sus proyectos, stack tecnológico y más detalles sobre su trabajo. De hecho, este mismo chatbot que está usando ahora es una muestra de lo que Jordan puede construir con n8n y Evolution API. 😉\\n\\nEscriba *menu* para volver al inicio.'\n\n### Si escriben cualquier otra cosa:\nIntenta responder usando la información del CV. Si no puedes, sugiere volver al menú."
+        }
+      },
+      "id": "450a7823-41a1-44fd-839f-7185324792a9",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        4272,
+        944
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "82871e49-471b-4bed-9298-31b67bb31202",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        4304,
+        1136
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "contextWindowLength": 20
+      },
+      "id": "7e18427d-3394-429d-8ae8-a749c4fe7ac4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        4496,
+        1136
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Process the following message:\n\n {{ $json.output }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "# Instructions for Formatting Messages for WhatsApp\n\nAct as an expert in digital communication specialized in WhatsApp Business. Your task is to take any long message and reorganize it into multiple messages optimized for WhatsApp, keeping ALL the original information.\n\n## Formatting rules:\n\n### General structure:\n1. Message 1: Introduction + basic data (keep original greeting/context)\n2. Message 2: Main features\n3. Message 3: Services and policies\n\n### Format of each message:\n- Maximum 3-4 lines per message\n- Use relevant emojis to make it more visual\n- Keep the original tone of the message\n- Do NOT lose any data: addresses, capacities, schedules, etc.\n\n## Output format:\nAlways return a JSON with this exact structure:\n\n```json\n{\n  \"respuesta\": [\n    \"First message text\",\n    \"Second message text\",\n    \"Final message text\"\n  ]\n}\n```\n\n### Rules for JSON:\n- Each array element is an individual message\n- Keep logical order: intro -> features -> services -> call to action\n- Do NOT add explanatory text outside the JSON\n- Do NOT number the messages in the JSON"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "id": "62f37882-ebd0-4456-a57b-293682206ce3",
+      "name": "Format Response",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "position": [
+        4784,
+        960
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "848a5d8b-7363-490b-8c63-3e718f7b93ff",
+      "name": "OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        4784,
+        1136
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"respuesta\": []\n}",
+        "autoFix": true
+      },
+      "id": "dfeabfbc-b6eb-4f86-9bf6-6cbc34cbef3c",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "position": [
+        4928,
+        1184
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output.respuesta",
+        "options": {}
+      },
+      "id": "0550224a-5e8b-4c8e-9966-12d3b294fd6f",
+      "name": "Split Messages",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        5024,
+        960
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "228e36f0-1373-4615-908b-b4b8c12eb2b2",
+      "name": "Loop Messages",
+      "type": "n8n-nodes-base.splitInBatches",
+      "position": [
+        5312,
+        960
+      ],
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "or",
+          "conditions": [
+            {
+              "id": "494e1ce8-176e-4abd-8fd6-d0c5b26e78a4",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              },
+              "leftValue": "={{ $json['output.respuesta'] }}",
+              "rightValue": ".png"
+            },
+            {
+              "id": "510a248f-d20b-4ed9-8592-38ccf89be197",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              },
+              "leftValue": "={{ $json['output.respuesta'] }}",
+              "rightValue": ".jpg"
+            },
+            {
+              "id": "79ddf663-4e64-459f-9b62-85ff7846f2a4",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              },
+              "leftValue": "={{ $json['output.respuesta'] }}",
+              "rightValue": ".jpeg"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e1199ffd-65f0-4fad-bd74-bb7544514d97",
+      "name": "Is Image URL?",
+      "type": "n8n-nodes-base.if",
+      "position": [
+        5520,
+        1120
+      ],
+      "typeVersion": 2.2
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "operation": "send-image",
+        "instanceName": "={{ $('Parse Message Data').item.json.instance }}",
+        "remoteJid": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "media": "={{ $('Loop Messages').item.json['output.respuesta'] }}",
+        "options_message": {}
+      },
+      "id": "4f222082-c648-490c-8df2-6f969419edb4",
+      "name": "Send Image",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "position": [
+        5712,
+        1024
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Parse Message Data').item.json.instance }}",
+        "remoteJid": "={{ $('Parse Message Data').item.json.remoteJid }}",
+        "messageText": "={{ $json['output.respuesta'] }}",
+        "options_message": {
+          "delay": "={{ $json['output.respuesta'].length * 60 }}"
+        }
+      },
+      "id": "dfa966e0-b33a-4ab9-89f3-e9b16c05ab60",
+      "name": "Send Text",
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "position": [
+        5712,
+        1200
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "evolutionApi": {
+          "id": "1iYiPrppxry4DBEN",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "id": "ff54c3a9-ce17-445c-8d1b-561c3306c2fb",
+      "name": "Wait Between Messages",
+      "type": "n8n-nodes-base.wait",
+      "position": [
+        5904,
+        1120
+      ],
+      "webhookId": "wait-between",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "0cc1d0b7-bd52-4544-929a-113bf274764e",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        5520,
+        864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Parse Message Data').item.json.remoteJid }}"
+      },
+      "id": "9b39dd58-0cb7-4f58-9015-6186eaf0fdd9",
+      "name": "Clear Queue",
+      "type": "n8n-nodes-base.redis",
+      "position": [
+        5712,
+        864
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "redis": {
+          "id": "7Fzy0Kqxes7tye0m",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "50d0f0ab-f48f-4f66-9c3e-b48eddc97119",
+      "name": "Done",
+      "type": "n8n-nodes-base.noOp",
+      "position": [
+        5904,
+        864
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "id": "045a6390-a632-48b4-af49-9d8fe74c8c02",
+      "name": "OpenAI Chat Model2",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        4928,
+        1392
+      ],
+      "typeVersion": 1.2,
+      "credentials": {
+        "openAiApi": {
+          "id": "0tMEjg6vk53Bsomd",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait 2s": {
+      "main": [
+        [
+          {
+            "node": "Mark as Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Clear Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Text": {
+      "main": [
+        [
+          {
+            "node": "Wait Between Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Image": {
+      "main": [
+        [
+          {
+            "node": "Wait Between Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Queue": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unify Input": {
+      "main": [
+        [
+          {
+            "node": "Queue Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Unify Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Read": {
+      "main": [
+        [
+          {
+            "node": "Route by Message Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Image": {
+      "main": [
+        [
+          {
+            "node": "Format Image Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Image URL?": {
+      "main": [
+        [
+          {
+            "node": "Send Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Messages": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Image URL?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue Message": {
+      "main": [
+        [
+          {
+            "node": "Wait for More Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Messages": {
+      "main": [
+        [
+          {
+            "node": "Loop Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Split Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Audio": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Image": {
+      "main": [
+        [
+          {
+            "node": "Analyze Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Last Message?": {
+      "main": [
+        [
+          {
+            "node": "Concatenate Messages",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Last - Stop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Receive WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Parse Message Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Audio": {
+      "main": [
+        [
+          {
+            "node": "Format Audio Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Audio Input": {
+      "main": [
+        [
+          {
+            "node": "Unify Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Image Input": {
+      "main": [
+        [
+          {
+            "node": "Unify Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Format Response",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Message Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Allowed Numbers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Document": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Queued Messages": {
+      "main": [
+        [
+          {
+            "node": "Is Last Message?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Document": {
+      "main": [
+        [
+          {
+            "node": "Format Document Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Concatenate Messages": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Audio Base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image Base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Document Input": {
+      "main": [
+        [
+          {
+            "node": "Unify Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Message Type": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Audio Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Image Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Document Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Unsupported Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Between Messages": {
+      "main": [
+        [
+          {
+            "node": "Loop Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Allowed Numbers": {
+      "main": [
+        [
+          {
+            "node": "Wait 2s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for More Messages": {
+      "main": [
+        [
+          {
+            "node": "Get Queued Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Document Base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Unsupported Message": {
+      "main": [
+        [
+          {
+            "node": "End Unsupported",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Format Response",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "12462868-cd82-4144-ba7e-2a532a5186da",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6968e82e3be55e1efbdb459fc7ad36c979272d2d420b3c7ee9db3b73c4b67e3b"
+  },
+  "id": "2zmmmGEHbeqHRZhS",
+  "tags": []
+}
